@@ -1,0 +1,29 @@
+{
+    "son_guncelleme": "29.07.2026 - 01:58",
+    "fiyat_listesi": [
+        {
+            "model": "A 200 AMG",
+            "baslangic_fiyati": "2.550.000 ₺"
+        },
+        {
+            "model": "C 200 4MATIC",
+            "baslangic_fiyati": "3.850.000 ₺"
+        },
+        {
+            "model": "E 180 Exclusive",
+            "baslangic_fiyati": "4.950.000 ₺"
+        }
+    ],
+    "stoktaki_araclar": [
+        {
+            "model": "E 180 Exclusive",
+            "anahtar_teslim_fiyati": "5.150.000 ₺",
+            "durum": "Hemen Teslim"
+        },
+        {
+            "model": "EQB 250+ AMG",
+            "anahtar_teslim_fiyati": "3.250.000 ₺",
+            "durum": "Stokta Var"
+        }
+    ]
+}

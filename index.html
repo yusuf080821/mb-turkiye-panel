@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercedes-Benz Türkiye Bilgi Paneli</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --mb-black: #000000;
+            --mb-dark-gray: #333333;
+            --mb-light-gray: #f4f4f4;
+            --mb-blue: #00a0d6;
+            --mb-white: #ffffff;
+        }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--mb-light-gray); color: var(--mb-dark-gray); }
+        .sidebar { width: 250px; background-color: var(--mb-black); color: var(--mb-white); position: fixed; height: 100vh; display: flex; flex-direction: column; }
+        .logo-area { padding: 20px; text-align: center; border-bottom: 1px solid #222; font-size: 18px; letter-spacing: 2px; font-weight: 300; }
+        .nav-menu { list-style: none; padding: 0; margin: 0; }
+        .nav-menu li { padding: 15px 25px; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; gap: 15px; border-left: 3px solid transparent; }
+        .nav-menu li:hover, .nav-menu li.active { background-color: #1a1a1a; border-left: 3px solid var(--mb-blue); }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-weight: 400; color: var(--mb-black); }
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .card { background: var(--mb-white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-title { margin-top: 0; font-size: 18px; font-weight: 600; border-bottom: 2px solid var(--mb-light-gray); padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #fafafa; color: #555; font-weight: 600; font-size: 14px; }
+        tr:hover { background-color: #f9f9f9; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-area">
+            <i class="fa-solid fa-car" style="margin-bottom:10px; font-size: 24px;"></i><br>
+            MB PANEL TR
+        </div>
+        <ul class="nav-menu">
+            <li class="active"><i class="fa-solid fa-chart-pie"></i> Özet Ekranı</li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>Türkiye Pazar Özeti</h1>
+            <div id="son-guncelleme" style="font-size: 14px; color: #666;">
+                <i class="fa-solid fa-clock"></i> Veriler Yükleniyor...
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-title">Başlangıç Fiyat Listesi</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Başlangıç Fiyatı</th>
+                        </tr>
+                    </thead>
+                    <tbody id="liste-fiyatlari-body">
+                        <tr><td colspan="2" class="loading">Güncel veriler bekleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Canlı Stok ve Anahtar Teslim</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Anahtar Teslim Fiyatı</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stok-araclar-body">
+                        <tr><td colspan="3" class="loading">Güncel veriler bekleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verileri Çeken JavaScript Kodu -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('mb_veriler.json')
+                .then(response => {
+                    if (!response.ok) { throw new Error("Veri dosyası bulunamadı!"); }
+                    return response.json();
+                })
+                .then(data => {
+                    // Son güncellemeyi yazdır
+                    document.getElementById('son-guncelleme').innerHTML = `<i class="fa-solid fa-clock"></i> Son Güncelleme: ${data.son_guncelleme}`;
+                    
+                    // Liste Fiyatlarını Doldur
+                    const listeBody = document.getElementById('liste-fiyatlari-body');
+                    listeBody.innerHTML = '';
+                    data.fiyat_listesi.forEach(arac => {
+                        listeBody.innerHTML += `<tr><td><strong>${arac.model}</strong></td><td>${arac.baslangic_fiyati}</td></tr>`;
+                    });
+
+                    // Stok Araçlarını Doldur
+                    const stokBody = document.getElementById('stok-araclar-body');
+                    stokBody.innerHTML = '';
+                    data.stoktaki_araclar.forEach(arac => {
+                        stokBody.innerHTML += `<tr><td><strong>${arac.model}</strong></td><td><strong>${arac.anahtar_teslim_fiyati}</strong></td><td><span style="color: green;">${arac.durum}</span></td></tr>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    document.getElementById('son-guncelleme').innerHTML = `<span style="color:red;"><i class="fa-solid fa-triangle-exclamation"></i> Veri bağlantı hatası!</span>`;
+                });
+        });
+    </script>
+</body>
+</html>
